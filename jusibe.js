@@ -1,9 +1,9 @@
 /*
  * Jusibe API wrapper
- * @author Eseyin Wale <@ewdave>
+ * @author Wale Eseyin <@ewdave>
  */
 
-'use strict'
+'use strict';
 
 var request = require('request');
 
@@ -29,13 +29,12 @@ function Jusibe(publicKey, accessToken) {
 Jusibe.prototype = {
 
 	send_sms: function(params, callback) {
-		var params = params || {}
 
 		return this._request({
 			method: 'POST',
 			endpoint: '/send_sms',
 			body: params
-		}, function(error,callback) {
+		}, function(error, callback) {
       if (error) {
         return callback(error, null)
       }
@@ -70,7 +69,7 @@ Jusibe.prototype = {
     })
 	},
 
-	_request: function(options,callback) {
+	_request: function(options, callback) {
 		var options = options || {};
 
 		if (!options.method) {
@@ -91,12 +90,18 @@ Jusibe.prototype = {
 
 			options.headers = {
 				'Authorization': ['Basic ', header_toBase64].join(''),
+        'Accept': 'application/json',
 				'Content-Type': 'application/json'
 			}
 		}
 
 		request(options, function(error, response, body) {
 			//Error from API
+      if (response.statusCode === 401) {
+        var error_message = 'Invalid public_key or access_token';
+        error = new Error(error_message);
+        body = null;
+      }
 
 			return callback(error, body);
 		});
